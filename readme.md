@@ -1,8 +1,3 @@
-Here's a sample `README.md` file for your **Webpage to Markdown Converter** project on GitHub. This `README` outlines the project details, installation, usage, and contributions. You can modify it based on your specific project details.
-
-### `README.md`
-
-```markdown
 # Webpage to Markdown Converter
 
 A simple Flask-based web application that allows users to input a URL and convert the content of the webpage into Markdown format. The application strips unnecessary elements such as headers, footers, navigation bars, and sidebars, focusing primarily on the article content. Users can download the converted Markdown or HTML file.

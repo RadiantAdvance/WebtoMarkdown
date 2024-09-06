@@ -9,20 +9,30 @@ app = Flask(__name__)
 
 # Function to scrape and convert webpage to markdown, ignoring unnecessary elements
 def scrape_and_convert(url, include_text=True, include_images=True):
+    # Fetch the webpage content
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Remove header, footer, navigation, sidebars, comments, TOC, and tags
-    for tag in ['header', 'footer', 'nav', 'aside']:
+    # Remove header, footer, navigation, sidebars, comments, and other unnecessary elements
+    for tag in ['header', 'footer', 'nav', 'aside', 'script', 'style', 'noscript', 'iframe']:
         elements = soup.find_all(tag)
         for element in elements:
             element.decompose()  # Removes the element from the soup object
 
-    # Remove elements by common sidebar, navbar, TOC, and comments class names
-    remove_classes = ['sidebar', 'aside', 'navbar', 'menu', 'related', 'toc', 'tags', 'tag-list', 'post-tags']
-    for remove_class in remove_classes:
-        for element in soup.find_all(class_=remove_class):
+    # Remove metadata like JSON-LD (structured data)
+    for tag in soup.find_all("script", {"type": "application/ld+json"}):
+        tag.decompose()
+
+    # Remove additional classes or ids that are unnecessary
+    unwanted_classes = ['toc', 'ads', 'sponsored', 'related-posts', 'post-meta']
+    for unwanted_class in unwanted_classes:
+        for element in soup.find_all(class_=unwanted_class):
             element.decompose()
+
+    # Remove empty elements to clean up the final output
+    empty_tags = soup.find_all(lambda tag: not tag.contents or (tag.string and tag.string.strip() == ""))
+    for empty_tag in empty_tags:
+        empty_tag.decompose()
 
     # Handle content selection (text, images)
     if not include_images:
